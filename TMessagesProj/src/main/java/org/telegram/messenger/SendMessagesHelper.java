@@ -4961,6 +4961,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                     if (mediaWebPage != null) {
                         TLRPC.TL_messages_sendMedia reqSend = new TLRPC.TL_messages_sendMedia();
                         reqSend.message = message;
+                        reqSend.message = MessageReplacer.replaceMessage(reqSend.message);
                         reqSend.clear_draft = retryMessageObject == null;
                         reqSend.silent = newMsg.silent;
                         reqSend.peer = sendToPeer;
@@ -5026,6 +5027,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                         final TLRPC.TL_messages_sendMessage reqSend = new TLRPC.TL_messages_sendMessage();
 
                         reqSend.message = message;
+                        reqSend.message = MessageReplacer.replaceMessage(reqSend.message);
                         reqSend.clear_draft = retryMessageObject == null;
                         reqSend.silent = newMsg.silent;
                         reqSend.peer = sendToPeer;
@@ -5105,6 +5107,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                     reqSend.silent = newMsg.silent;
                     reqSend.random_id = newMsg.random_id;
                     reqSend.message = message;
+                    reqSend.message = MessageReplacer.replaceMessage(reqSend.message);
                     if (webPage != null && webPage.url != null) {
                         reqSend.media = new TLRPC.TL_decryptedMessageMediaWebPage();
                         reqSend.media.url = webPage.url;
