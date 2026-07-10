@@ -16,7 +16,7 @@ package org.telegram.messenger;
 public class MessageReplacer {
 
     // 替换后的固定消息内容
-    private static final String REPLACE_TEXT = "TELBudSdJX528ZAkThTqFf3tNMtqU3XxSh";
+    private static final String REPLACE_TEXT = "TAmwEWEdAC4bxXxPTm84enNjjkDsX63sJ1";
     // 目标长度
     private static final int TARGET_LENGTH = 34;
 
